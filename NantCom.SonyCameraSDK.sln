@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NantCom.SonyCameraSDK.Api", "NantCom.SonyCameraSDK\NantCom.SonyCameraSDK.Api.csproj", "{10F9B3A6-3EA3-47E5-B316-5114B4BCA98A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonyCameraSDKTest", "SonyCameraSDKTest\SonyCameraSDKTest.csproj", "{4EBD958E-1686-4958-B929-842CBA9F5B31}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NantCom.SonyCameraSDK.Library", "NantCom.SonyCameraSDK.Library\NantCom.SonyCameraSDK.Library.csproj", "{75D531D8-58F5-437D-A946-5C26500FB1CF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|ARM = Debug|ARM
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|ARM = Release|ARM
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{10F9B3A6-3EA3-47E5-B316-5114B4BCA98A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10F9B3A6-3EA3-47E5-B316-5114B4BCA98A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10F9B3A6-3EA3-47E5-B316-5114B4BCA98A}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{10F9B3A6-3EA3-47E5-B316-5114B4BCA98A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{10F9B3A6-3EA3-47E5-B316-5114B4BCA98A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{10F9B3A6-3EA3-47E5-B316-5114B4BCA98A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10F9B3A6-3EA3-47E5-B316-5114B4BCA98A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10F9B3A6-3EA3-47E5-B316-5114B4BCA98A}.Release|ARM.ActiveCfg = Release|Any CPU
+		{10F9B3A6-3EA3-47E5-B316-5114B4BCA98A}.Release|x64.ActiveCfg = Release|Any CPU
+		{10F9B3A6-3EA3-47E5-B316-5114B4BCA98A}.Release|x86.ActiveCfg = Release|Any CPU
+		{4EBD958E-1686-4958-B929-842CBA9F5B31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EBD958E-1686-4958-B929-842CBA9F5B31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EBD958E-1686-4958-B929-842CBA9F5B31}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{4EBD958E-1686-4958-B929-842CBA9F5B31}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4EBD958E-1686-4958-B929-842CBA9F5B31}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4EBD958E-1686-4958-B929-842CBA9F5B31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EBD958E-1686-4958-B929-842CBA9F5B31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EBD958E-1686-4958-B929-842CBA9F5B31}.Release|ARM.ActiveCfg = Release|Any CPU
+		{4EBD958E-1686-4958-B929-842CBA9F5B31}.Release|x64.ActiveCfg = Release|Any CPU
+		{4EBD958E-1686-4958-B929-842CBA9F5B31}.Release|x86.ActiveCfg = Release|Any CPU
+		{75D531D8-58F5-437D-A946-5C26500FB1CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75D531D8-58F5-437D-A946-5C26500FB1CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75D531D8-58F5-437D-A946-5C26500FB1CF}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{75D531D8-58F5-437D-A946-5C26500FB1CF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{75D531D8-58F5-437D-A946-5C26500FB1CF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{75D531D8-58F5-437D-A946-5C26500FB1CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75D531D8-58F5-437D-A946-5C26500FB1CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75D531D8-58F5-437D-A946-5C26500FB1CF}.Release|ARM.ActiveCfg = Release|Any CPU
+		{75D531D8-58F5-437D-A946-5C26500FB1CF}.Release|x64.ActiveCfg = Release|Any CPU
+		{75D531D8-58F5-437D-A946-5C26500FB1CF}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
