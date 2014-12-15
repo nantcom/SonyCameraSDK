@@ -34,8 +34,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Camera.cs" />
     <Compile Include="Api.cs" />
+    <Compile Include="EnumConstants.cs" />
     <Compile Include="JsonRPC\SonyJsonRPCException.cs" />
     <Compile Include="JsonRPC\SonyJsonRPCRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

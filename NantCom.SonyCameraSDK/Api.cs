@@ -7,6 +7,7 @@ using NantCom.SonyCameraSDK.JsonRPC;
 using System.Threading.Tasks;
 using PortableRest;
 using System.Threading;
+using System.Net.Http;
 
 namespace NantCom.SonyCameraSDK
 {
@@ -36,6 +37,10 @@ namespace NantCom.SonyCameraSDK
             if (_RestClient == null)
             {
                 _RestClient = new RestClient();
+                _RestClient.JsonSerializerSettings = new Newtonsoft.Json.JsonSerializerSettings()
+                {
+                    DateFormatHandling = Newtonsoft.Json.DateFormatHandling.IsoDateFormat,
+                };
             }
 
             
@@ -57,19 +62,48 @@ namespace NantCom.SonyCameraSDK
 
 
             var req = new RestRequest( _BaseUrl );
-            req.AddParameter( requestInfo );
+            req.Method = HttpMethod.Post;
+            req.ContentType = ContentTypes.Json;
+            req.AddParameter(requestInfo);
 
-            result = _RestClient.SendAsync<SonyJsonRPCResponse>(req);
+            result = TaskEx.Run(async () =>
+            {
+                var response = await _RestClient.SendAsync<SonyJsonRPCResponse>(req);
+                return response.Content;
+            });
 
             return true;
         }
     }
-
-    public class Api
+    
+    /// <summary>
+    /// Class which maps all Sony Camera SDK APIs
+    /// </summary>
+    public class CameraApiClient
     {
-        private dynamic camera = new ApiRequestor("/camera");
-        private dynamic avContent = new ApiRequestor("/avContent");
-        private dynamic system = new ApiRequestor("/system");
+        private dynamic camera;
+        private dynamic avContent;
+        private dynamic system;
+
+        /// <summary>
+        /// Gets or sets the model.
+        /// </summary>
+        /// <value>
+        /// The model.
+        /// </value>
+        public string Model { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CameraApiClient"/> class.
+        /// </summary>
+        /// <param name="baseUrl">The base URL.</param>
+        public CameraApiClient( string model, string cameraBaseUrl, string systemBaseUrl, string avContentBaseUrl )
+        {
+            this.Model = model;
+            this.camera = new ApiRequestor(cameraBaseUrl + "/camera");
+            this.avContent = new ApiRequestor(avContentBaseUrl + "/avContent");
+            this.system = new ApiRequestor(systemBaseUrl + "/system");
+        }
 
         /// <summary>
         /// This API provides a function to set a value of shooting mode.
@@ -382,7 +416,7 @@ namespace NantCom.SonyCameraSDK
         public Task<SonyJsonRPCResponse> SetTouchAFPosition( double x, double y)
         {
             return camera.setTouchAFPosition( x, y);
-        }1
+        }
 
         /// <summary>
         /// This API provides a function to get current touch AF position.
@@ -1964,34 +1998,6 @@ namespace NantCom.SonyCameraSDK
         }
 
 
-    }
-
-    public enum ZoomDirection
-    {
-        /// <summary>
-        /// Zoom-in
-        /// </summary>
-        In,
-        /// <summary>
-        /// Zoom-out
-        /// </summary>
-        Out
-    }
-
-    public enum ZoomMovement
-    {
-        /// <summary>
-        /// Long push
-        /// </summary>
-        Start,
-        /// <summary>
-        /// Stop
-        /// </summary>
-        Stop,
-        /// <summary>
-        /// Short push
-        /// </summary>
-        OneShot
     }
 
 }

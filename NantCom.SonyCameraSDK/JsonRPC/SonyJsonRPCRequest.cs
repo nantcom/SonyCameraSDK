@@ -47,6 +47,6 @@ namespace NantCom.SonyCameraSDK.JsonRPC
         /// <summary>
         /// The latest request identifier
         /// </summary>
-        public static int LatestRequestId = 0;
+        public static int LatestRequestId = 1;
     }
 }
