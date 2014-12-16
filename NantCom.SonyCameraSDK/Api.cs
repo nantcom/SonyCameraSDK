@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using PortableRest;
 using System.Threading;
 using System.Net.Http;
+using System.Diagnostics;
+using Newtonsoft.Json;
 
 namespace NantCom.SonyCameraSDK
 {
@@ -65,11 +67,28 @@ namespace NantCom.SonyCameraSDK
             req.Method = HttpMethod.Post;
             req.ContentType = ContentTypes.Json;
             req.AddParameter(requestInfo);
-
-            result = TaskEx.Run(async () =>
+            
+            result = TaskEx.Run(() =>
             {
-                var response = await _RestClient.SendAsync<SonyJsonRPCResponse>(req);
-                return response.Content;
+                //Debug.WriteLine("API Request: {0}, Body {1}", _BaseUrl, JsonConvert.SerializeObject(requestInfo));
+
+                SonyJsonRPCResponse response = null;
+                try
+                {
+                    var serverResponse = _RestClient.SendAsync<SonyJsonRPCResponse>(req).Result;
+                    response = serverResponse.Content;
+                }
+                catch (Exception ex)
+                {
+                    // there is error - build our own response
+                    response = new SonyJsonRPCResponse();
+                    response.Error = new object [] { 500, ex.Message, ex };
+
+                    //Debug.WriteLine("API Request Failed: {0}", ex.Message);
+
+                }
+
+                return response;
             });
 
             return true;

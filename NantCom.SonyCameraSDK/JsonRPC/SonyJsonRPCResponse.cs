@@ -74,5 +74,19 @@ namespace NantCom.SonyCameraSDK.JsonRPC
         /// </value>
         [JsonProperty("id")]
         public int RequestId { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether this response represents a success call.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this instance is success; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsSuccess
+        {
+            get
+            {
+                return this.Error == null;
+            }
+        }
     }
 }
