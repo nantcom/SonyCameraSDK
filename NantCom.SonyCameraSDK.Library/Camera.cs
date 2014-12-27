@@ -1,7 +1,10 @@
 ﻿using NantCom.SonyCameraSDK;
 using NantCom.SonyCameraSDK.JsonRPC;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -202,6 +205,7 @@ namespace NantCom.SonyCameraSDK
             }
 
             #endregion
+
         }
 
         /// <summary>
@@ -610,6 +614,11 @@ namespace NantCom.SonyCameraSDK
             _Client = client;
             this.CameraOptions = new Options();
         }
+        
+        public Camera()
+        {
+
+        }
 
         /// <summary>
         /// Updates that status from given RPC Response;
@@ -771,19 +780,8 @@ namespace NantCom.SonyCameraSDK
             }
             
             _DisableUpdate = false;
-            this.PropertyChanged(this, new PropertyChangedEventArgs(string.Empty));
         }
         
-        /// <summary>
-        /// Updates the status.
-        /// </summary>
-        /// <returns></returns>
-        public async Task UpdateStatus()
-        {
-            var result = await _Client.GetEvent(false);
-            this.UpdateFromEventResponse(result);
-        }
-
         private Task _PollingTask;
 
         /// <summary>
@@ -801,30 +799,35 @@ namespace NantCom.SonyCameraSDK
             }
 
             var context = System.Threading.SynchronizationContext.Current;
-            _PollingTask = Task.Run(() =>
+            var longPolling = false; // first time
+
+            _PollingTask = Task.Run(async () =>
             {
                 while (token.IsCancellationRequested == false)
                 {
                     try
                     {
-                        //Debug.WriteLine("Polling Status...");
+                        Debug.WriteLine("Polling Status...");
 
-                        var newEvent = _Client.GetEvent(true).Result;
+                        var newEvent = await _Client.GetEvent(longPolling);
+                        longPolling = true;
 
+                        this.UpdateFromEventResponse(newEvent);
                         context.Post((state) =>
                         {
-                            this.UpdateFromEventResponse(newEvent);
+                            this.PropertyChanged(this, new PropertyChangedEventArgs(string.Empty));
 
                         }, null);
 
-                        //Debug.WriteLine("Status has changed.");
+                        Debug.WriteLine("Status has changed.");
+
                     }
                     catch (Exception)
                     {
-                        //Debug.WriteLine("No Change Detected.");
+                        Debug.WriteLine("No Change Detected.");
                     }
 
-                    Task.Delay(1000).Wait();
+                    await Task.Delay(1000);
                 }
             });
 
@@ -839,12 +842,81 @@ namespace NantCom.SonyCameraSDK
         {
             var liveViewUrl = (string)(await _Client.StartLiveview()).Result;
             var client = new LiveViewClient(liveViewUrl);
+
             client.ImageReceived += (sender, data) =>
             {
                 this.LiveViewImageReceived(data);
             };
 
             client.StartLiveView(provideHTTPStream, token);
+        }
+
+        /// <summary>
+        /// Take Photo with single press shutter
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> Shutter( Action<string> handleTakenPhoto )
+        {
+            if (this.Status != "IDLE")
+            {
+                return false;
+            }
+
+            SonyJsonRPCResponse response = null;
+            if (this.ShootMode == "still")
+            {
+                response = await this.ApiClient.ActTakePicture();
+            }
+            else
+            {
+                await this.ApiClient.SetShootMode("still");
+                while (this.ShootMode != "still")
+                {
+                    await Task.Delay(500);
+                }
+                response = await this.ApiClient.ActTakePicture();
+            }
+
+            if (response.IsSuccess)
+            {
+                handleTakenPhoto((string)response.Result[0]);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Toggles the movie recording.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> ToggleMovieRecording()
+        {
+            if (this.Status == "MovieRecording")
+            {
+                this.ApiClient.StopMovieRec();
+                return true;
+            }
+
+            if (this.Status != "IDLE")
+            {
+                return false;
+            }
+
+            if (this.ShootMode == "movie")
+            {
+                this.ApiClient.StartMovieRec();
+            }
+            else
+            {
+                await this.ApiClient.SetShootMode("movie");
+                while (this.ShootMode != "movie")
+                {
+                    await Task.Delay(500);
+                }
+                this.ApiClient.StartMovieRec();
+            }
+
+            return true;
         }
 
         #region Function to send settings to camera
@@ -1089,5 +1161,23 @@ namespace NantCom.SonyCameraSDK
 
         #endregion
 
+#if DEBUG
+
+        /// <summary>
+        /// Gets the sample.
+        /// </summary>
+        /// <value>
+        /// The sample.
+        /// </value>
+        public static Camera Sample
+        {
+            get
+            {
+                var data = "{\"CameraOptions\":{\"Functions\":[\"Remote Shooting\",\"Contents Transfer\"],\"MovieQuality\":null,\"OISModes\":null,\"ViewAngles\":null,\"Modes\":[\"Intelligent Auto\",\"Superior Auto\",\"Program Auto\"],\"PostViewImageSizes\":[\"2M\",\"Original\"],\"SelfTimers\":[\"0\",\"2\",\"10\"],\"ShootMode\":[\"still\",\"movie\"],\"ExposureCompensationMinimum\":-6,\"ExposureCompensationMaximum\":6,\"ExposureCompensationStepIndex\":1,\"FlashModes\":null,\"FNumber\":null,\"FocusModes\":null,\"ISOSpeedCandidates\":[\"AUTO\",\"100\",\"200\",\"400\",\"800\",\"1600\",\"3200\"],\"ShutterSpeeds\":null,\"ColorTemperatureMinimum\":null,\"ColorTemperatureMaximum\":null,\"ColorTemperatureStep\":null,\"ZoomSettings\":null,\"IsColorTemperatureSupported\":false},\"Status\":\"IDLE\",\"ZoomPercentage\":0,\"IsLiveViewReady\":true,\"LiveViewOrientation\":\"0\",\"RecordableTime\":null,\"RecordablePhotos\":2590,\"StorageDescription\":null,\"CurrentFunction\":\"Remote Shooting\",\"MovieQuality\":null,\"PhotoAspect\":\"16:9\",\"PhotoResolution\":\"13M\",\"OISMode\":null,\"ViewAngle\":null,\"Mode\":\"Program Auto\",\"PostViewImageSize\":\"Original\",\"SelfTimer\":0,\"ShootMode\":\"still\",\"ExposureCompensation\":0,\"FlashMode\":null,\"FNumber\":null,\"FocusMode\":null,\"ISO\":\"3200\",\"IsProgramShifted\":null,\"ShutterSpeed\":null,\"WhiteBalance\":\"Auto WB\",\"ColorTemperature\":-1,\"IsTouchAFSet\":false,\"ApiClient\":{\"Model\":\"DSC-QX10\"}}";
+                return JsonConvert.DeserializeObject<Camera>(data);
+            }
+        }
+
+#endif
     }
 }
