@@ -20,202 +20,18 @@ namespace NantCom.SonyCameraSDK
     /// </summary>
     public class Camera : INotifyPropertyChanged
     {
-        /// <summary>
-        /// Possible options for this camera
-        /// </summary>
-        public class Options
-        {
-            /// <summary>
-            /// Gets the available camera functions.
-            /// </summary>
-            /// <value>
-            /// The functions.
-            /// </value>
-            public string[] Functions { get; set; }
-
-            /// <summary>
-            /// Gets or sets the movie quality.
-            /// </summary>
-            /// <value>
-            /// The movie quality.
-            /// </value>
-            public string[] MovieQuality { get; set; }
-
-            /// <summary>
-            /// Gets or sets the ois modes.
-            /// </summary>
-            /// <value>
-            /// The ois modes.
-            /// </value>
-            public string[] OISModes { get; set; }
-
-            /// <summary>
-            /// Gets or sets the view angles.
-            /// </summary>
-            /// <value>
-            /// The view angles.
-            /// </value>
-            public string[] ViewAngles { get; set; }
-
-            /// <summary>
-            /// Gets or sets the modes.
-            /// </summary>
-            /// <value>
-            /// The modes.
-            /// </value>
-            public string[] Modes { get; set; }
-
-            /// <summary>
-            /// Gets or sets the post view image sizes.
-            /// </summary>
-            /// <value>
-            /// The post view image sizes.
-            /// </value>
-            public string[] PostViewImageSizes { get; set; }
-
-            /// <summary>
-            /// Gets or sets the self timers.
-            /// </summary>
-            /// <value>
-            /// The self timers.
-            /// </value>
-            public string[] SelfTimers { get; set; }
-
-            /// <summary>
-            /// Gets or sets the shoot mode.
-            /// </summary>
-            /// <value>
-            /// The shoot mode.
-            /// </value>
-            public string[] ShootMode { get; set; }
-
-            /// <summary>
-            /// Gets or sets the exposure compensation minimum.
-            /// </summary>
-            /// <value>
-            /// The exposure compensation minimum.
-            /// </value>
-            public int? ExposureCompensationMinimum { get; set; }
-
-            /// <summary>
-            /// Gets or sets the exposure compensation maximum.
-            /// </summary>
-            /// <value>
-            /// The exposure compensation maximum.
-            /// </value>
-            public int? ExposureCompensationMaximum { get; set; }
-
-            /// <summary>
-            /// Gets or sets the index of the exposure compensation step. 1 = 1/3EV, 2 = 1/2EV
-            /// </summary>
-            /// <value>
-            /// The index of the exposure compensation step.
-            /// </value>
-            public int? ExposureCompensationStepIndex { get; set; }
-
-            /// <summary>
-            /// Gets or sets the flash modes.
-            /// </summary>
-            /// <value>
-            /// The flash modes.
-            /// </value>
-            public string[] FlashModes { get; set; }
-
-            /// <summary>
-            /// Gets or sets the f number.
-            /// </summary>
-            /// <value>
-            /// The f number.
-            /// </value>
-            public string[] FNumber { get; set; }
-
-            /// <summary>
-            /// Gets or sets the focus modes.
-            /// </summary>
-            /// <value>
-            /// The focus modes.
-            /// </value>
-            public string[] FocusModes { get; set; }
-
-            /// <summary>
-            /// Gets or sets the iso speed candidates.
-            /// </summary>
-            /// <value>
-            /// The iso speed candidates.
-            /// </value>
-            public string[] ISOSpeedCandidates { get; set; }
-
-            /// <summary>
-            /// Gets or sets the shutter speeds.
-            /// </summary>
-            /// <value>
-            /// The shutter speeds.
-            /// </value>
-            public string[] ShutterSpeeds { get; set; }
-
-            /// <summary>
-            /// Gets or sets the color temperature minimum.
-            /// </summary>
-            /// <value>
-            /// The color temperature minimum.
-            /// </value>
-            public int? ColorTemperatureMinimum { get; set; }
-
-            /// <summary>
-            /// Gets or sets the color temperature maximum.
-            /// </summary>
-            /// <value>
-            /// The color temperature maximum.
-            /// </value>
-            public int? ColorTemperatureMaximum { get; set; }
-
-            /// <summary>
-            /// Gets or sets the color temperature step.
-            /// </summary>
-            /// <value>
-            /// The color temperature step.
-            /// </value>
-            public int? ColorTemperatureStep { get; set; }
-
-            /// <summary>
-            /// Gets or sets the available zoom settings.
-            /// </summary>
-            /// <value>
-            /// The zoom settings.
-            /// </value>
-            public string[] ZoomSettings { get; set; }
-
-            #region Supported Flags
-
-            /// <summary>
-            /// Gets a value indicating whether camera supports setting color temperature 
-            /// </summary>
-            /// <value>
-            /// <c>true</c> if color temperature setting supported; otherwise, <c>false</c>.
-            /// </value>
-            public bool IsColorTemperatureSupported
-            {
-                get
-                {
-                    return                        
-                        this.ColorTemperatureMaximum != null &&
-                        this.ColorTemperatureMinimum != null &&
-                        this.ColorTemperatureStep != null;
-                }
-            }
-
-            #endregion
-
-        }
+        #region Status Properties
 
         /// <summary>
-        /// Gets the camera options.
+        /// Current function of camera
         /// </summary>
-        /// <value>
-        /// The camera options.
-        /// </value>
-        public Options CameraOptions { get; private set; }
+        public string CurrentFunction { get; private set; }
 
+        /// <summary>
+        /// Current function of camera
+        /// </summary>
+        public string ShootMode { get; private set; }
+        
         /// <summary>
         /// Gets or sets the current camera status.
         /// </summary>
@@ -272,304 +88,6 @@ namespace NantCom.SonyCameraSDK
         /// </value>
         public string StorageDescription { get; private set; }
 
-        private string _CurrentFunction;
-        private string _PhotoAspect;
-        private string _PhotoResolution;
-        private string _OISMode;
-        private string _ViewAngle;
-        private string _Mode;
-        private string _PostViewImageSize;
-        private string _MovieQuality;
-        private int _SelfTimer;
-        private string _ShootMode;
-        private int _ExposureCompensation;
-        private string _FlashMode;
-        private string _FNumber;
-        private string _FocusMode;
-        private string _ISO;
-        private string _ShutterSpeed;
-        private string _WhiteBalance;
-        private int? _ColorTemperature;
-
-        ///<summary>
-        ///Get or set the value of CurrentFunction
-        ///</summary>
-        public string CurrentFunction
-        {
-            get
-            {
-                return _CurrentFunction;
-            }
-            set
-            {
-                this.SetCurrentFunction(value);
-            }
-        }
-
-        ///<summary>
-        ///Get or set the value of MovieQuality
-        ///</summary>
-        public string MovieQuality
-        {
-            get
-            {
-                return _MovieQuality;
-            }
-            set
-            {
-                this.SetMovieQuality(value);
-            }
-        }
-
-        /// <summary>
-        /// Get or set the value of PhotoAspect
-        /// </summary>
-        public string PhotoAspect
-        {
-            get
-            {
-                return _PhotoAspect;
-            }
-            set
-            {
-                this.SetPhotoAspect(value);
-            }
-        }
-
-        ///<summary>
-        ///Get or set the value of PhotoResolution
-        ///</summary>
-        public string PhotoResolution
-        {
-            get
-            {
-                return _PhotoResolution;
-            }
-            set
-            {
-                this.SetPhotoResolution(value);
-            }
-        }
-
-        ///<summary>
-        ///Get or set the value of OISMode
-        ///</summary>
-        public string OISMode
-        {
-            get
-            {
-                return _OISMode;
-            }
-            set
-            {
-                this.SetOISMode(value);
-            }
-        }
-
-        ///<summary>
-        ///Get or set the value of ViewAngle
-        ///</summary>
-        public string ViewAngle
-        {
-            get
-            {
-                return _ViewAngle;
-            }
-            set
-            {
-                this.SetViewAngle(value);
-            }
-        }
-
-        ///<summary>
-        ///Get or set the value of Mode
-        ///</summary>
-        public string Mode
-        {
-            get
-            {
-                return _Mode;
-            }
-            set
-            {
-                this.SetMode(value);
-            }
-        }
-
-        ///<summary>
-        ///Get or set the value of PostViewImageSize
-        ///</summary>
-        public string PostViewImageSize
-        {
-            get
-            {
-                return _PostViewImageSize;
-            }
-            set
-            {
-                this.SetPostViewImageSize(value);
-            }
-        }
-
-        ///<summary>
-        ///Get or set the value of SelfTimer
-        ///</summary>
-        public int SelfTimer
-        {
-            get
-            {
-                return _SelfTimer;
-            }
-            set
-            {
-                this.SetSelfTimer(value);
-            }
-        }
-
-        ///<summary>
-        ///Get or set the value of ShootMode
-        ///</summary>
-        public string ShootMode
-        {
-            get
-            {
-                return _ShootMode;
-            }
-            set
-            {
-                this.SetShootMode(value);
-            }
-        }
-
-        ///<summary>
-        ///Get or set the value of ExposureCompensation
-        ///</summary>
-        public int ExposureCompensation
-        {
-            get
-            {
-                return _ExposureCompensation;
-            }
-            set
-            {
-                this.SetExposureCompensation(value);
-            }
-        }
-
-        ///<summary>
-        ///Get or set the value of FlashMode
-        ///</summary>
-        public string FlashMode
-        {
-            get
-            {
-                return _FlashMode;
-            }
-            set
-            {
-                this.SetFlashMode(value);
-            }
-        }
-
-        ///<summary>
-        ///Get or set the value of FNumber
-        ///</summary>
-        public string FNumber
-        {
-            get
-            {
-                return _FNumber;
-            }
-            set
-            {
-                this.SetFNumber(value);
-            }
-        }
-
-        ///<summary>
-        ///Get or set the value of FocusMode
-        ///</summary>
-        public string FocusMode
-        {
-            get
-            {
-                return _FocusMode;
-            }
-            set
-            {
-                this.SetFocusMode(value);
-            }
-        }
-
-        ///<summary>
-        ///Get or set the value of ISO
-        ///</summary>
-        public string ISO
-        {
-            get
-            {
-                return _ISO;
-            }
-            set
-            {
-                this.SetISO(value);
-            }
-        }
-
-        ///<summary>
-        ///Get or set the value of IsProgramShifted
-        ///</summary>
-        public bool? IsProgramShifted
-        {
-            get;
-            private set;
-        }
-
-        ///<summary>
-        ///Get or set the value of ShutterSpeed
-        ///</summary>
-        public string ShutterSpeed
-        {
-            get
-            {
-                return _ShutterSpeed;
-            }
-            set
-            {
-                _ShutterSpeed = value;
-            }
-        }
-
-        ///<summary>
-        ///Get or set the value of WhiteBalance
-        ///</summary>
-        public string WhiteBalance
-        {
-            get
-            {
-                return _WhiteBalance;
-            }
-            set
-            {
-                this.SetWhiteBalance(value);
-            }
-        }
-
-        ///<summary>
-        ///Get or set the value of ColorTemperature
-        ///</summary>
-        public int? ColorTemperature
-        {
-            get
-            {
-                return _ColorTemperature;
-            }
-            set
-            {
-                this.SetColorTemperature(value);
-            }
-        }
-
         /// <summary>
         /// Gets a value indicating whether this instance is touch af set.
         /// </summary>
@@ -577,6 +95,60 @@ namespace NantCom.SonyCameraSDK
         /// <c>true</c> if this instance is touch af set; otherwise, <c>false</c>.
         /// </value>
         public bool? IsTouchAFSet { get; private set; }
+
+        public bool? IsProgramShifted { get; private set; }
+
+        #endregion
+
+        #region Setting Properties
+
+        public CameraSetting PhotoResolution { get { return _Settings["PhotoResolution"]; } }
+        public CameraSetting OISMode { get { return _Settings["OISMode"]; } }
+        public CameraSetting Mode { get { return _Settings["Mode"]; } }
+        public CameraSetting PostViewImageSize { get { return _Settings["PostViewImageSize"]; } }
+        public CameraSetting MovieQuality { get { return _Settings["MovieQuality"]; } }
+        public CameraSetting SelfTimer { get { return _Settings["SelfTimer"]; } }
+        public CameraSetting ExposureCompensation { get { return _Settings["ExposureCompensation"]; } }
+        public CameraSetting FlashMode { get { return _Settings["FlashMode"]; } }
+        public CameraSetting FNumber { get { return _Settings["FNumber"]; } }
+        public CameraSetting FocusMode { get { return _Settings["FocusMode"]; } }
+        public CameraSetting ISO { get { return _Settings["ISO"]; } }
+        public CameraSetting ShutterSpeed { get { return _Settings["ShutterSpeed"]; } }
+        public CameraSetting ViewAngle { get { return _Settings["ViewAngle"]; } }
+        public CameraSetting WhiteBalance { get { return _Settings["WhiteBalance"]; } }
+        public CameraSetting ColorTemperature { get { return _Settings["ColorTemperature"]; } }
+
+        #endregion
+
+        /// <summary>
+        /// Gets the available camera settings
+        /// </summary>
+        public IEnumerable<CameraSetting> AvailableSettings
+        {
+            get
+            {
+                return from s in _Settings.Values
+                       where s.AvailableOptions != null && s.AvailableOptions.Length > 0
+                       select s;
+            }
+        }
+
+        /// <summary>
+        /// Gets all Settings (use for sample data)
+        /// </summary>
+        public Dictionary<string, CameraSetting> AllSettings
+        {
+            get
+            {
+                return _Settings;
+            }
+#if DEBUG
+            set
+            {
+                _Settings = value;
+            }
+#endif
+        }
 
         /// <summary>
         /// Gets the API client.
@@ -602,33 +174,78 @@ namespace NantCom.SonyCameraSDK
         /// </summary>
         public event Action<ImageReceivedEventArgs> LiveViewImageReceived = delegate { };
 
+        /// <summary>
+        /// Fires when there is a long running process which require UI to be blocked
+        /// </summary>
+        public event Action<bool> LongRunningProcessOccured = delegate { };
+
         private bool _DisableUpdate = true;
+
+        /// <summary>
+        /// Disable Update
+        /// </summary>
+        internal bool DisableUpdate
+        {
+            get { return _DisableUpdate; }
+        }
+        internal SynchronizationContext Context
+        {
+            get { return _Context; }
+        }
+
         private CameraApiClient _Client;
+        private Dictionary<string, CameraSetting> _Settings;
+        private SynchronizationContext _Context;
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Camera"/> class.
         /// </summary>
         /// <param name="client">The camera api client.</param>
-        public Camera(CameraApiClient client)
+        public Camera(CameraApiClient client) : this()
         {
             _Client = client;
-            this.CameraOptions = new Options();
         }
         
+        /// <summary>
+        /// Create new instance of Camera
+        /// </summary>
         public Camera()
         {
+            _Context = SynchronizationContext.Current;
+            this.InitializeSettings();
+        }
 
+        private void OnPropertyChanged( string name )
+        {
+            _Context.Post((o) =>
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(name));
+
+            }, null);
+        }
+
+        private void OnPropertyChanged(IEnumerable<string> names)
+        {
+            _Context.Post((o) =>
+            {
+                foreach (var name in names)
+                {
+                    this.PropertyChanged(this, new PropertyChangedEventArgs(name));
+                }
+
+            }, null);
         }
 
         /// <summary>
         /// Updates that status from given RPC Response;
         /// </summary>
         /// <param name="response">The response.</param>
-        private void UpdateFromEventResponse(SonyJsonRPCResponse response)
+        private IEnumerable<string> UpdateFromEventResponse(SonyJsonRPCResponse response)
         {
-            if (response.IsSuccess == false)
+            if (response == null || response.IsSuccess == false)
             {
-                return;
+                yield break;
             }
 
             _DisableUpdate = true;
@@ -636,21 +253,25 @@ namespace NantCom.SonyCameraSDK
             if (response.Result[1] != null)
             {
                 this.Status = response.Result[1].cameraStatus;
+                yield return "Status";
             }
 
             if (response.Result[2] != null)
             {
                 this.ZoomPercentage = (int)response.Result[2].zoomPosition;
+                yield return "ZoomPercentage";
             }
 
             if (response.Result[3] != null)
             {
                 this.IsLiveViewReady = (bool)response.Result[3].liveviewStatus;
+                yield return "IsLiveViewReady";
             }
 
             if (response.Result[4] != null)
             {
                 this.LiveViewOrientation = (string)response.Result[4].liveviewOrientation;
+                yield return "LiveViewOrientation";
             }
 
             if (response.Result[10] != null)
@@ -662,123 +283,223 @@ namespace NantCom.SonyCameraSDK
                         this.RecordableTime = (int)item.recordableTime;
                         this.RecordablePhotos = (int)item.numberOfRecordableImages;
 
+                        if (this.RecordablePhotos == -1)
+                        {
+                            this.RecordablePhotos = null;
+                        }
+
                         if (this.RecordableTime == -1)
                         {
                             this.RecordableTime = null;
                         }
+
+                        yield return "RecordableTime";
+                        yield return "RecordablePhotos";
                     }
                 }
             }
 
             if (response.Result[12] != null)
             {
-                this.CameraOptions.Functions = Utility.ToArray(response.Result[12].cameraFunctionCandidates);
                 this.CurrentFunction = (string)response.Result[12].currentCameraFunction;
+                yield return "CurrentFunction";
             }
 
             if (response.Result[13] != null)
             {
-                this.CameraOptions.MovieQuality = Utility.ToArray(response.Result[13].movieQualityCandidates);
-                this.MovieQuality = (string)response.Result[13].currentMovieQuality;
+                this.MovieQuality.Value = (string)response.Result[13].currentMovieQuality;
+                this.MovieQuality.AvailableOptions = Utility.ToArray(response.Result[13].movieQualityCandidates);
+
+                yield return "MovieQuality";                
             }
 
             if (response.Result[14] != null)
             {
-                this.PhotoAspect = (string)response.Result[14].currentAspect;
-                this.PhotoResolution = (string)response.Result[14].currentSize;
+                this.PhotoResolution.Value = (string)response.Result[14].currentAspect + " - " + (string)response.Result[14].currentSize;
+                yield return "PhotoResolution";
+
+                Task.Run(async () =>
+                {
+                    var stillSizeResponse = await _Client.GetAvailableStillSize();
+                    var array = (JArray)stillSizeResponse.Result;
+
+                    this.PhotoResolution.AvailableOptions = (from dynamic item in (JArray)array[1]
+                                                                     select (string)item.aspect + " - " + (string)item.size).ToArray();
+                    this.PhotoResolution.OnNewValue = (s) =>
+                    {
+                        var parts = s.Split('-');
+                        _Client.SetStillSize(parts[0].Trim(), parts[1].Trim());
+                    };
+
+                    this.OnPropertyChanged("PhotoResolution");
+                    this.OnPropertyChanged("AvailableSettings");
+                });
+
             }
 
             if (response.Result[16] != null)
             {
-                this.CameraOptions.OISModes = Utility.ToArray(response.Result[16].steadyModeCandidates);
-                this.OISMode = (string)response.Result[16].currentSteadyMode;
+                this.OISMode.Value = (string)response.Result[16].currentSteadyMode;
+                this.OISMode.AvailableOptions = Utility.ToArray(response.Result[16].steadyModeCandidates);
+                
+                yield return "OISMode";
             }
 
 
             if (response.Result[17] != null)
             {
-                this.CameraOptions.ViewAngles = Utility.ToArray(response.Result[17].viewAngleCandidates);
-                this.ViewAngle = (string)response.Result[17].currentViewAngle;
+                this.ViewAngle.Value = (string)response.Result[17].currentViewAnglee;
+                this.ViewAngle.AvailableOptions = Utility.ToArray(response.Result[17].viewAngleCandidates);
+
+                yield return "ViewAngle";
             }
 
             if (response.Result[18] != null)
             {
-                this.CameraOptions.Modes = Utility.ToArray(response.Result[18].exposureModeCandidates);
-                this.Mode = (string)response.Result[18].currentExposureMode;
+                this.Mode.Value = (string)response.Result[18].currentExposureMode;
+                this.Mode.AvailableOptions = Utility.ToArray(response.Result[18].exposureModeCandidates);
+
+                yield return "Mode";
             }
 
             if (response.Result[19] != null)
             {
-                this.CameraOptions.PostViewImageSizes = Utility.ToArray(response.Result[19].postviewImageSizeCandidates);
-                this.PostViewImageSize = (string)response.Result[19].currentPostviewImageSize;
+                this.PostViewImageSize.Value = (string)response.Result[19].currentPostviewImageSize;
+                this.PostViewImageSize.AvailableOptions = Utility.ToArray(response.Result[19].postviewImageSizeCandidates);
+
+                yield return "PostViewImageSize";
             }
 
             if (response.Result[20] != null)
             {
-                this.CameraOptions.SelfTimers = Utility.ToArray(response.Result[20].selfTimerCandidates);
-                this.SelfTimer = (int)response.Result[20].currentSelfTimer;
+                this.SelfTimer.Value = (string)response.Result[20].currentSelfTimer;
+                this.SelfTimer.AvailableOptions = Utility.ToArray(response.Result[20].selfTimerCandidates);
+
+                yield return "SelfTimer";
             }
 
             if (response.Result[21] != null)
             {
-                this.CameraOptions.ShootMode = Utility.ToArray(response.Result[21].shootModeCandidates);
                 this.ShootMode = (string)response.Result[21].currentShootMode;
+                yield return "ShootMode";
             }
 
             if (response.Result[25] != null)
             {
-                this.CameraOptions.ExposureCompensationMinimum = (int)response.Result[25].minExposureCompensation;
-                this.CameraOptions.ExposureCompensationMaximum = (int)response.Result[25].maxExposureCompensation;
-                this.CameraOptions.ExposureCompensationStepIndex = (int)response.Result[25].stepIndexOfExposureCompensation;
-                this.ExposureCompensation = (int)response.Result[25].currentExposureCompensation;
+
+                var min = (int)response.Result[25].minExposureCompensation;
+                var max = (int)response.Result[25].maxExposureCompensation;
+                var stepType = (int)response.Result[25].stepIndexOfExposureCompensation;
+
+                var divisor = stepType == 1 ? 3.0 : 2.0;
+
+                this.ExposureCompensation.Value = string.Format("{0:0.0}", (int)response.Result[25].currentExposureCompensation / divisor);
+
+                List<string> range = new List<string>();
+                for (int i = min; i <= max; i++)
+                {
+                    range.Add( string.Format("{0:0.0}", i / divisor) );
+                }
+
+                this.ExposureCompensation.AvailableOptions = range.ToArray();
+
+                this.ExposureCompensation.OnNewValue = (s) => _Client.SetExposureCompensation((int)(double.Parse(s) * divisor));
+
+                yield return "ExposureCompensation";
             }
 
             if (response.Result[26] != null)
             {
-                this.CameraOptions.FlashModes = Utility.ToArray(response.Result[26].flashModeCandidates);
-                this.FlashMode = (string)response.Result[26].currentFlashMode;
+                this.FlashMode.Value = (string)response.Result[26].currentFlashMode;
+                this.FlashMode.AvailableOptions = Utility.ToArray(response.Result[26].flashModeCandidates);
+
+                yield return "FlashMode";
             }
 
             if (response.Result[27] != null)
             {
-                this.CameraOptions.FNumber = Utility.ToArray(response.Result[27].fNumberCandidates);
-                this.FNumber = (string)response.Result[27].currentFNumber;
+                this.FNumber.Value = (string)response.Result[27].currentFNumber;
+                this.FNumber.AvailableOptions = Utility.ToArray(response.Result[27].fNumberCandidates);
+
+                yield return "FNumber";
             }
 
             if (response.Result[28] != null)
             {
-                this.CameraOptions.FocusModes = Utility.ToArray(response.Result[28].focusModeCandidates);
-                this.FocusMode = (string)response.Result[28].currentFocusMode;
+                this.FocusMode.Value = (string)response.Result[28].currentFocusMode;
+                this.FocusMode.AvailableOptions = Utility.ToArray(response.Result[28].focusModeCandidates);
+                yield return "FocusMode";
             }
 
             if (response.Result[29] != null)
             {
-                this.CameraOptions.ISOSpeedCandidates = Utility.ToArray(response.Result[29].isoSpeedRateCandidates);
-                this.ISO = (string)response.Result[29].currentIsoSpeedRate;
+                this.ISO.Value = (string)response.Result[29].currentIsoSpeedRate;
+                this.ISO.AvailableOptions = Utility.ToArray(response.Result[29].isoSpeedRateCandidates);
+                yield return "ISO";
             }
 
             if (response.Result[31] != null)
             {
                 this.IsProgramShifted = (bool?)response.Result[31].isShifted;
+                yield return "IsProgramShifted"; 
             }
 
             if (response.Result[32] != null)
             {
-                this.CameraOptions.ShutterSpeeds = Utility.ToArray(response.Result[32].shutterSpeedCandidates);
-                this.ShutterSpeed = (string)response.Result[32].currentShutterSpeed;
+                this.ShutterSpeed.Value = (string)response.Result[32].currentShutterSpeed;
+                this.ShutterSpeed.AvailableOptions = Utility.ToArray(response.Result[32].shutterSpeedCandidates);
+                yield return "ShutterSpeed";
             }
 
             if (response.Result[33] != null)
             {
-                this.WhiteBalance = (string)response.Result[33].currentWhiteBalanceMode;
-                this.ColorTemperature = (int)response.Result[33].currentColorTemperature;
+                this.WhiteBalance.Value = (string)response.Result[33].currentWhiteBalanceMode;
+                this.ColorTemperature.Value = (string)response.Result[33].currentColorTemperature;
+
+                yield return "WhiteBalance";
+                yield return "ColorTemperature"; 
+
+                Task.Run(async () =>
+                {
+                    var wbResponse = await _Client.GetAvailableWhiteBalance();
+                    if (wbResponse.IsSuccess == false)
+                    {
+                        this.WhiteBalance.AvailableOptions = null;
+                        return;
+                    }
+
+                    this.WhiteBalance.AvailableOptions = (from dynamic item in (JArray)(wbResponse.Result[1])
+                                                          let mode = (string)item.whiteBalanceMode
+                                                          where mode != "Color Temperature"
+                                                          select mode).ToArray();
+
+                    if (this.WhiteBalance.AvailableOptions.Contains("Color Temperature"))
+                    {
+                        var array = (JArray)wbResponse.Result;
+                        var modes = (JArray)array[1];
+                        var range = (from dynamic item in modes
+                                    where item.whiteBalanceMode == "Color Temperature"
+                                    select (JArray)item.colorTemperatureRange).FirstOrDefault();
+
+                        if ( range != null )
+                        {
+                            this.ColorTemperature.AvailableOptions = Utility.ToArray(range);
+                        }
+
+                    }
+
+                    this.OnPropertyChanged("WhiteBalance");
+                    this.OnPropertyChanged("AvailableSettings");
+
+                });
             }
 
             if (response.Result[34] != null)
             {
-                this.IsTouchAFSet = (bool?)response.Result[34].currentSet;
+                this.IsTouchAFSet = (bool)response.Result[34].currentSet;
+                yield return "IsTouchAFSet";
             }
-            
+
             _DisableUpdate = false;
         }
         
@@ -798,26 +519,21 @@ namespace NantCom.SonyCameraSDK
                 }
             }
 
-            var context = System.Threading.SynchronizationContext.Current;
-            var longPolling = false; // first time
+            await this.RefreshStatus();
 
             _PollingTask = Task.Run(async () =>
             {
                 while (token.IsCancellationRequested == false)
                 {
+                    var start = DateTime.Now;
+
                     try
                     {
                         Debug.WriteLine("Polling Status...");
 
-                        var newEvent = await _Client.GetEvent(longPolling);
-                        longPolling = true;
-
-                        this.UpdateFromEventResponse(newEvent);
-                        context.Post((state) =>
-                        {
-                            this.PropertyChanged(this, new PropertyChangedEventArgs(string.Empty));
-
-                        }, null);
+                        var newEvent = await _Client.GetEvent(true);
+                        var changed2 = this.UpdateFromEventResponse(newEvent);
+                        this.OnPropertyChanged(changed2);
 
                         Debug.WriteLine("Status has changed.");
 
@@ -827,11 +543,36 @@ namespace NantCom.SonyCameraSDK
                         Debug.WriteLine("No Change Detected.");
                     }
 
-                    await Task.Delay(1000);
+                    // try to update no frequent than 2 times/second
+                    var end = DateTime.Now;
+                    var passed = (start - end).TotalSeconds;
+
+                    if (passed > 0.5)
+                    {
+                        continue;
+                    }
+                    await Task.Delay( TimeSpan.FromSeconds( 0.5 - passed ));
                 }
             });
 
-            await _PollingTask;
+        }
+
+        /// <summary>
+        /// Refresh status, this will clear all menu
+        /// </summary>
+        /// <param name="token">The token.</param>
+        public async Task RefreshStatus()
+        {
+            foreach (var item in _Settings.Values)
+            {
+                item.AvailableOptions = null;
+            }
+
+            var newEvent = await _Client.GetEvent(false);
+            var changed = this.UpdateFromEventResponse(newEvent);
+
+            this.OnPropertyChanged(changed);
+            this.OnPropertyChanged("AvailableSettings");
         }
 
         /// <summary>
@@ -921,263 +662,171 @@ namespace NantCom.SonyCameraSDK
 
         #region Function to send settings to camera
 
-        private void SetColorTemperature(int? value)
+        /// <summary>
+        /// Initializes the settings
+        /// </summary>
+        private void InitializeSettings()
         {
-            if (_ColorTemperature == value)
+            _Settings = new Dictionary<string, CameraSetting>();
+
+            _Settings.Add("ExposureCompensation", new CameraSetting()
             {
-                return;
-            }
-            _ColorTemperature = value;
+                Group = "Photographic",
+                Name = "Exposure Compensation",
+                Description = "Normally, camera will attempt to capture equal brightness of the whole scene. " +
+                "Using Exposure compensation will allow you to make dark area brigther at the cost of detail in brighter areas.",
 
-            if (_DisableUpdate)
-                return;
+                // OnNewValue is set in status update due to complex setting
+            });
 
-            _Client.SetWhiteBalance("Color Temperature", true, value.Value);
-        }
-
-        private void SetWhiteBalance(string value)
-        {
-            if (_WhiteBalance == value)
+            _Settings.Add("FlashMode", new CameraSetting()
             {
-                return;
-            }
-            _WhiteBalance = value;
+                Group = "Photographic",
+                Name = "FlashMode",
+                OnNewValue = (value) => _Client.SetFlashMode(value)
+            });
 
-            if (_DisableUpdate)
-                return;
-
-            _Client.SetWhiteBalance(value);
-        }
-
-        private void SetISO(string value)
-        {
-            if (_ISO == value)
+            _Settings.Add("FNumber", new CameraSetting()
             {
-                return;
-            }
-            _ISO = value;
+                Group = "Photographic",
+                Name = "FNumber",
+                OnNewValue = (value) => _Client.SetFNumber(value)
+            });
 
-            if (_DisableUpdate)
-                return;
-
-            _Client.SetIsoSpeedRate(value);
-        }
-
-        private void SetFocusMode(string value)
-        {
-            if (_FocusMode == value)
+            _Settings.Add("FocusMode", new CameraSetting()
             {
-                return;   
-            }
-            _FocusMode = value;
+                Group = "Photographic",
+                Name = "FocusMode",
+                OnNewValue = (value) => _Client.SetFocusMode(value)
+            });
 
-            if (_DisableUpdate)
-                return;
-
-            _Client.SetFocusMode(value);
-        }
-
-        private void SetFNumber(string value)
-        {
-            if (_FNumber == value)
+            _Settings.Add("ISO", new CameraSetting()
             {
-                return;
-            }
-            _FNumber = value;
+                Group = "Photographic",
+                Name = "ISO",
+                OnNewValue = (value) => _Client.SetIsoSpeedRate(value)
+            });
 
-            if (_DisableUpdate)
-                return;
-
-            _Client.SetFNumber(value);
-        }
-
-        private void SetFlashMode(string value)
-        {
-            if (_FlashMode == value)
+            _Settings.Add("Mode", new CameraSetting()
             {
-                return;
-            }
-            _FlashMode = value;
+                Name = "Exposure Mode",
+                Description = "Set how you want to control the exposure settings of the camera. For example, in Auto mode the F Number would have no effect.",
+                OnNewValue = async (value) =>
+                {
+                    _Context.Post((obj) =>
+                    {
+                        this.LongRunningProcessOccured(true);
 
-            if (_DisableUpdate)
-                return;
+                    }, null);
 
-            _Client.SetFlashMode(value);
-        }
+                    await Task.Run( ()=>{
 
-        private void SetExposureCompensation(int value)
-        {
-            if (_ExposureCompensation == value)
+                        _Client.SetExposureMode(value).Wait();
+                        this.RefreshStatus().Wait();
+
+                    });
+
+                    _Context.Post((obj) =>
+                    {
+                        this.LongRunningProcessOccured(false);
+
+                    }, null);
+                }
+            });
+
+            _Settings.Add("MovieQuality", new CameraSetting()
             {
-                return;
-            }
-            _ExposureCompensation = value;
+                Group = "Output",
+                Name = "Movie Quality",
+                OnNewValue = (value) => _Client.SetMovieQuality(value)
+            });
 
-            if (_DisableUpdate)
-                return;
-
-            _Client.SetExposureCompensation(value);
-        }
-
-        private void SetShootMode(string value)
-        {
-            if (_ShootMode == value)
+            _Settings.Add("OISMode", new CameraSetting()
             {
-                return;
-            }
-            _ShootMode = value;
+                Group = "Photographic",
+                Name = "SteadyShot Mode",
+                OnNewValue = (value) => _Client.SetSteadyMode(value)
+            });
 
-            if (_DisableUpdate)
-                return;
-
-            _Client.SetShootMode(value);
-        }
-
-        private void SetSelfTimer(int value)
-        {
-            if (_SelfTimer == value)
+            _Settings.Add("PhotoResolution", new CameraSetting()
             {
-                return;
-            }
-            _SelfTimer = value;
+                Group = "Output",
+                Name = "Captured Image Resolution",
+                Description = "Adjust the dimension and resolution of captured photo. Higher resolution is usually always better if space is not a concern.",
 
-            if (_DisableUpdate)
-                return;
+                // OnNewValue is set in update status
+            });
 
-            _Client.SetSelfTimer(value);
-        }
-
-        private void SetCurrentFunction(string value)
-        {
-            if (_CurrentFunction == value)
+            _Settings.Add("PostViewImageSize", new CameraSetting()
             {
-                return;
-            }
-            _CurrentFunction = value;
+                Group = "Output",
+                Name = "Review Image Resolution",
+                Description = "Set the resolution of review image shown after each shot. " +
+                "Higher resolution will make it slower to download from camera but allow you to save full resolution photo to your phone. " +
+                "Note that Facebook only allow up to 2M size",
+                OnNewValue = (value) => _Client.SetPostviewImageSize(value)
+            });
 
-            if (_DisableUpdate)
-                return;
 
-            _Client.SetCameraFunction(value);
-        }
-
-        private void SetMovieQuality(string value)
-        {
-            if (_MovieQuality == value)
+            _Settings.Add("SelfTimer", new CameraSetting()
             {
-                return;
-            }
-            _MovieQuality = value;
+                Name = "Self Timer",
+                Description = "Set time of self Timer function",
+                OnNewValue = (value) => _Client.SetSelfTimer(double.Parse(value))
+            });
 
-            if (_DisableUpdate)
-                return;
-
-            _Client.SetMovieQuality(value);
-        }
-
-        private void SetPhotoAspect(string value)
-        {
-            if (_PhotoAspect == value)
+            _Settings.Add("ShutterSpeed", new CameraSetting()
             {
-                return;
-            }
-            _PhotoAspect = value;
+                Group = "Photographic",
+                Name = "Shutter Speed",
+                Description = "Adjust the length of time camera will let the light to hit the sensor." +
+                "More time will allow brighter images in low light condition but will blur moving subject",
+                OnNewValue = (value) => _Client.SetShutterSpeed(value)
+            });
 
-            if (_DisableUpdate)
-                return;
-
-            _Client.SetStillSize(value, _PhotoResolution);
-        }
-
-        private void SetPhotoResolution(string value)
-        {
-            if (_PhotoResolution == value)
+            _Settings.Add("ViewAngle", new CameraSetting()
             {
-                return;
-            }
-            _PhotoResolution = value;
+                Group = "Output",
+                Name = "View Angle",
+                Description = "Specify the recorded View Angle",
+                OnNewValue = (value) => _Client.SetViewAngle(value)
+            });
 
-            if (_DisableUpdate)
-                return;
-
-            _Client.SetStillSize(_PhotoAspect, value);
-        }
-
-        private void SetOISMode(string value)
-        {
-            if (_OISMode == value)
+            _Settings.Add("WhiteBalance", new CameraSetting()
             {
-                return;
-            }
-            _OISMode = value;
+                Group = "Photographic",
+                Name = "White Balance",
+                Description = "Adjust the color tone of captured image." +
+                "Auto will let the camera attempt to make white color captured as natural white, while other" +
+                " modes allow you to make it warmer (more yellow) or colder (more blue).",
+                OnNewValue = (s) => _Client.SetWhiteBalance(s)
+            });
 
-            if (_DisableUpdate)
-                return;
-
-            _Client.SetSteadyMode(value);
-        }
-
-        private void SetViewAngle(string value)
-        {
-            if (_ViewAngle == value)
+            _Settings.Add("ColorTemperature", new CameraSetting()
             {
-                return;
-            }
-            _ViewAngle = value;
+                Group = "Photographic",
+                Name = "Color Temperature",
+                Description = "Adjust the color tone of captured image." +
+                "Special white balance mode for professional lighting or when you want to configure the" +
+                " color temperature manually. More numbers is more blue while lower number is more yellow",
+                OnNewValue = (s) =>
+                {
+                    _Client.SetWhiteBalance("Color Temperature", true, int.Parse(s));
 
-            if (_DisableUpdate)
-                return;
+                    _DisableUpdate = true;
+                    this.WhiteBalance.Value = "Color Temperature";
+                    _DisableUpdate = false;
+                }
+            });
 
-            _Client.SetViewAngle(value);
-        }
-
-        private void SetMode(string value)
-        {
-            if (_Mode == value)
+            foreach (var item in _Settings.Values)
             {
-                return;
+                item.Owner = this;
             }
-            _Mode = value;
-
-            if (_DisableUpdate)
-                return;
-
-            _Client.SetExposureMode(value);
         }
-
-        private void SetPostViewImageSize(string value)
-        {
-            if (_PostViewImageSize == value)
-            {
-                return;
-            }
-            _PostViewImageSize = value;
-
-            if (_DisableUpdate)
-                return;
-
-            _Client.SetPostviewImageSize(value);
-        }
-
+        
         #endregion
 
-#if DEBUG
 
-        /// <summary>
-        /// Gets the sample.
-        /// </summary>
-        /// <value>
-        /// The sample.
-        /// </value>
-        public static Camera Sample
-        {
-            get
-            {
-                var data = "{\"CameraOptions\":{\"Functions\":[\"Remote Shooting\",\"Contents Transfer\"],\"MovieQuality\":null,\"OISModes\":null,\"ViewAngles\":null,\"Modes\":[\"Intelligent Auto\",\"Superior Auto\",\"Program Auto\"],\"PostViewImageSizes\":[\"2M\",\"Original\"],\"SelfTimers\":[\"0\",\"2\",\"10\"],\"ShootMode\":[\"still\",\"movie\"],\"ExposureCompensationMinimum\":-6,\"ExposureCompensationMaximum\":6,\"ExposureCompensationStepIndex\":1,\"FlashModes\":null,\"FNumber\":null,\"FocusModes\":null,\"ISOSpeedCandidates\":[\"AUTO\",\"100\",\"200\",\"400\",\"800\",\"1600\",\"3200\"],\"ShutterSpeeds\":null,\"ColorTemperatureMinimum\":null,\"ColorTemperatureMaximum\":null,\"ColorTemperatureStep\":null,\"ZoomSettings\":null,\"IsColorTemperatureSupported\":false},\"Status\":\"IDLE\",\"ZoomPercentage\":0,\"IsLiveViewReady\":true,\"LiveViewOrientation\":\"0\",\"RecordableTime\":null,\"RecordablePhotos\":2590,\"StorageDescription\":null,\"CurrentFunction\":\"Remote Shooting\",\"MovieQuality\":null,\"PhotoAspect\":\"16:9\",\"PhotoResolution\":\"13M\",\"OISMode\":null,\"ViewAngle\":null,\"Mode\":\"Program Auto\",\"PostViewImageSize\":\"Original\",\"SelfTimer\":0,\"ShootMode\":\"still\",\"ExposureCompensation\":0,\"FlashMode\":null,\"FNumber\":null,\"FocusMode\":null,\"ISO\":\"3200\",\"IsProgramShifted\":null,\"ShutterSpeed\":null,\"WhiteBalance\":\"Auto WB\",\"ColorTemperature\":-1,\"IsTouchAFSet\":false,\"ApiClient\":{\"Model\":\"DSC-QX10\"}}";
-                return JsonConvert.DeserializeObject<Camera>(data);
-            }
-        }
-
-#endif
     }
 }
