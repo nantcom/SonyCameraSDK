@@ -62,6 +62,7 @@ namespace NantCom.SonyCameraSDK
 
         private int _CurrentFrame = 0;
         private int _FrameCompleted = 0;
+        private CancellationToken _Token;
 
         private void ReportCompleted()
         {
@@ -95,6 +96,8 @@ namespace NantCom.SonyCameraSDK
         /// <param name="cancel">The cancel.</param>
         public void StartLiveView( Func<string, Stream> getHttpStream, CancellationToken cancel)
         {
+            _Token = cancel;
+
             TaskEx.Run(() =>
             {
                 var stream = getHttpStream(_Url);

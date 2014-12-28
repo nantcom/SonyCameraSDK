@@ -65,6 +65,22 @@ namespace NantCom.SonyCameraSDK
         public string LiveViewOrientation { get; private set; }
 
         /// <summary>
+        /// Whether live view is running
+        /// </summary>
+        public bool IsLiveViewRunning
+        {
+            get
+            {
+                if (_LiveViewCancelSource == null)
+                {
+                    return false;
+                }
+
+                return _LiveViewCancelSource.IsCancellationRequested == false;
+            }
+        }
+
+        /// <summary>
         /// Gets the recordable time (in minutes)
         /// </summary>
         /// <value>
@@ -502,26 +518,26 @@ namespace NantCom.SonyCameraSDK
 
             _DisableUpdate = false;
         }
-        
-        private Task _PollingTask;
+
+        private CancellationTokenSource _PollingCancelSource;
 
         /// <summary>
         /// Starts the status polling.
         /// </summary>
         /// <param name="token">The token.</param>
-        public async Task StartStatusPolling( CancellationToken token )
-        {   
-            if (_PollingTask != null)
+        public async Task StartStatusPolling()
+        {
+            if (_PollingCancelSource != null)
             {
-                if (_PollingTask.IsCompleted == false )
-                {
-                    return;
-                }
+                _PollingCancelSource.Cancel();
+                _PollingCancelSource.Dispose();
             }
+            _PollingCancelSource = new CancellationTokenSource();
 
             await this.RefreshStatus();
 
-            _PollingTask = Task.Run(async () =>
+            var token = _PollingCancelSource.Token;
+            Task.Run(async () =>
             {
                 while (token.IsCancellationRequested == false)
                 {
@@ -542,19 +558,19 @@ namespace NantCom.SonyCameraSDK
                     {
                         Debug.WriteLine("No Change Detected.");
                     }
-
-                    // try to update no frequent than 2 times/second
-                    var end = DateTime.Now;
-                    var passed = (start - end).TotalSeconds;
-
-                    if (passed > 0.5)
-                    {
-                        continue;
-                    }
-                    await Task.Delay( TimeSpan.FromSeconds( 0.5 - passed ));
                 }
             });
 
+        }
+
+        public void StopStatusPolling()
+        {
+            if (_PollingCancelSource != null)
+            {
+                _PollingCancelSource.Cancel();
+                _PollingCancelSource.Dispose();
+                _PollingCancelSource = null;
+            }
         }
 
         /// <summary>
@@ -575,21 +591,46 @@ namespace NantCom.SonyCameraSDK
             this.OnPropertyChanged("AvailableSettings");
         }
 
+        private LiveViewClient _LiveViewClient;
+        private CancellationTokenSource _LiveViewCancelSource;
+        
         /// <summary>
         /// Creates the live view client.
         /// </summary>
         /// <returns></returns>
-        public async Task StartLiveView( Func<string, Stream> provideHTTPStream, CancellationToken token )
+        public async Task StartLiveView( Func<string, Stream> provideHTTPStream )
         {
-            var liveViewUrl = (string)(await _Client.StartLiveview()).Result;
-            var client = new LiveViewClient(liveViewUrl);
+            if (_LiveViewCancelSource != null)
+            {
+                _LiveViewCancelSource.Cancel();
+                _LiveViewCancelSource.Dispose();
+            }
 
-            client.ImageReceived += (sender, data) =>
+            _LiveViewCancelSource = new CancellationTokenSource();
+
+            var liveViewUrl = (string)(await _Client.StartLiveview()).Result;
+            _LiveViewClient = new LiveViewClient(liveViewUrl);
+
+            _LiveViewClient.ImageReceived += (sender, data) =>
             {
                 this.LiveViewImageReceived(data);
             };
 
-            client.StartLiveView(provideHTTPStream, token);
+            _LiveViewClient.StartLiveView(provideHTTPStream, _LiveViewCancelSource.Token);
+        }
+                
+        /// <summary>
+        /// Creates the live view client.
+        /// </summary>
+        /// <returns></returns>
+        public void StopLivewView()
+        {
+            if (_LiveViewCancelSource != null)
+            {
+                _LiveViewCancelSource.Cancel();
+                _LiveViewCancelSource.Dispose();
+                _LiveViewCancelSource = null;
+            }
         }
 
         /// <summary>
