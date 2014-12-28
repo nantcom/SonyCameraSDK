@@ -62,33 +62,28 @@ namespace NantCom.SonyCameraSDK
 
         private int _CurrentFrame = 0;
         private int _FrameCompleted = 0;
-        private int _SkipDegree = 5; // skip every 5 frames if frame drop
-        private const int MAX_SKIPDEGREE = 5; // skip every 5 frames
 
         private void ReportCompleted()
         {
-            Interlocked.Increment( ref _FrameCompleted );
+            _FrameCompleted++;
         }
 
         private void OnImageReceived(byte[] data)
         {
-            if ( Interlocked.Increment(ref _CurrentFrame) - _FrameCompleted > 5 )
+            if ( _CurrentFrame - _FrameCompleted > 2 )
             {
-                // increase skipping until skip every other frame
-                _SkipDegree = Math.Max(2, _SkipDegree - 1);
-                _FrameCompleted = _CurrentFrame;
-
-                if (_CurrentFrame % _SkipDegree == 0)
-                {
-                    return; // skip frame
-                }
+                GC.Collect(0, GCCollectionMode.Forced);
+                return;
             }
             else
             {
-                // ui thread start to catch up, reduce skipping
-                _SkipDegree = Math.Min(MAX_SKIPDEGREE, _SkipDegree + 1);
+                if (_CurrentFrame % 30 == 0)
+                {
+                    GC.Collect(0, GCCollectionMode.Forced);
+                }
             }
 
+            _CurrentFrame++;
             this.ImageReceived( this,
                 new ImageReceivedEventArgs( data, this.ReportCompleted ));
         }
