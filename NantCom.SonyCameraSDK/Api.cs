@@ -70,7 +70,7 @@ namespace NantCom.SonyCameraSDK
             
             result = TaskEx.Run(() =>
             {
-                //Debug.WriteLine("API Request: {0}, Body {1}", _BaseUrl, JsonConvert.SerializeObject(requestInfo));
+                Debug.WriteLine("API Request: {0}, Body {1}", _BaseUrl, JsonConvert.SerializeObject(requestInfo));
 
                 SonyJsonRPCResponse response = null;
                 try
@@ -84,9 +84,15 @@ namespace NantCom.SonyCameraSDK
                     response = new SonyJsonRPCResponse();
                     response.Error = new object [] { 500, ex.Message, ex };
 
-                    //Debug.WriteLine("API Request Failed: {0}", ex.Message);
 
                 }
+
+#if DEBUG
+                if (response != null && response.IsSuccess == false)
+                {
+                    Debug.WriteLine("API Request Failed: {0}", (string)response.Error[1]);
+                }
+#endif
 
                 return response;
             });
@@ -604,7 +610,7 @@ namespace NantCom.SonyCameraSDK
         /// </returns>
         public Task<SonyJsonRPCResponse> SetSelfTimer( double seconds)
         {
-            return camera.setSelfTimer();
+            return camera.setSelfTimer(seconds);
         }
  
         /// <summary>
