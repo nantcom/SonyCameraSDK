@@ -1909,7 +1909,7 @@ namespace NantCom.SonyCameraSDK
         public Task<SonyJsonRPCResponse> SetCurrentTime( DateTime dateTime, int timeZoneOffsetMinute, int dstOffsetMinute)
         {
             return this.system.setCurrentTime( new {
-                dateTime = dateTime,
+                dateTime = dateTime.ToString("yyyy-MM-ddTHH:mm:ssZ"),
                 timeZoneOffsetMinute = timeZoneOffsetMinute,
                 dstOffsetMinute = dstOffsetMinute
             });

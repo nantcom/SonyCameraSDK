@@ -112,6 +112,16 @@ namespace NantCom.SonyCameraSDK
         /// </value>
         public bool? IsTouchAFSet { get; private set; }
 
+        /// <summary>
+        /// Current Touch AF Position
+        /// </summary>
+        public double TouchAfPositionX { get; private set; }
+
+        /// <summary>
+        /// Current Touch AF Position
+        /// </summary>
+        public double TouchAfPositionY { get; private set; }
+
         public bool? IsProgramShifted { get; private set; }
 
         #endregion
@@ -510,11 +520,27 @@ namespace NantCom.SonyCameraSDK
                 });
             }
 
-            if (response.Result[34] != null)
-            {
-                this.IsTouchAFSet = (bool)response.Result[34].currentSet;
-                yield return "IsTouchAFSet";
-            }
+            //if (response.Result[34] != null)
+            //{
+            //    var array = (JArray)response.Result[34].currentTouchCoordinates;
+
+            //    if (array.Count == 0)
+            //    {
+            //        this.IsTouchAFSet = false;
+            //        this.TouchAfPositionX = 0;
+            //        this.TouchAfPositionY = 0;
+            //    }
+            //    else
+            //    {
+            //        this.IsTouchAFSet = true;
+            //        this.TouchAfPositionX = (double)array[0];
+            //        this.TouchAfPositionY = (double)array[1];
+
+            //    }
+            //    yield return "IsTouchAFSet";
+            //    yield return "TouchAfPositionX";
+            //    yield return "TouchAfPositionY";
+            //}
 
             _DisableUpdate = false;
         }
@@ -608,6 +634,12 @@ namespace NantCom.SonyCameraSDK
 
             _LiveViewCancelSource = new CancellationTokenSource();
 
+
+            await _Client.SetCurrentTime( DateTime.UtcNow,
+                (int)TimeZoneInfo.Local.BaseUtcOffset.TotalMinutes, 0);
+
+            await _Client.StartRecMode();
+
             var liveViewUrl = (string)(await _Client.StartLiveview()).Result;
             _LiveViewClient = new LiveViewClient(liveViewUrl);
 
@@ -631,6 +663,27 @@ namespace NantCom.SonyCameraSDK
                 _LiveViewCancelSource.Dispose();
                 _LiveViewCancelSource = null;
             }
+        }
+
+        /// <summary>
+        /// Sets the AF position relative to screen position. X and Y must be in percentage (such as 24.7, not 0.247)
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public async void SetTouchAF( double x, double y )
+        {
+            var result = await _Client.SetTouchAFPosition(x, y);
+            if (result.IsSuccess)
+            {
+                this.TouchAfPositionX = x;
+                this.TouchAfPositionY = y;
+                this.IsTouchAFSet = true;
+
+                this.OnPropertyChanged("IsTouchAFSet");
+                this.OnPropertyChanged("TouchAfPositionX");
+                this.OnPropertyChanged("TouchAfPositionY");
+            }
+
         }
 
         /// <summary>
