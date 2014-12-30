@@ -60,6 +60,11 @@ namespace NantCom.SonyCameraSDK
         /// </summary>
         public event EventHandler<ImageReceivedEventArgs> ImageReceived = delegate { };
 
+        /// <summary>
+        /// Occurs when live view was disconnected
+        /// </summary>
+        public event Action LiveViewDisconnected = delegate { };
+
         private int _CurrentFrame = 0;
         private int _FrameCompleted = 0;
         private CancellationToken _Token;
@@ -100,43 +105,50 @@ namespace NantCom.SonyCameraSDK
 
             TaskEx.Run(() =>
             {
-                var stream = getHttpStream(_Url);
-
-                byte[] headerBuffer = new byte[8 + 128];
-                while (cancel.IsCancellationRequested == false)
+                try
                 {
-                    // camera will flush data in sequence, dont have to store it in temp
+                    var stream = getHttpStream(_Url);
 
-                    // read common head and payload header
-                    var bytesRead = stream.Read(headerBuffer, 0, 8 + 128);
-
-                    var isJpeg = headerBuffer[1] == 0x01;
-
-                    int startSize = 8 + 4;
-                    int payloadSize = headerBuffer[startSize];
-                    payloadSize <<= 8;
-                    payloadSize += headerBuffer[startSize + 1];
-                    payloadSize <<= 8;
-                    payloadSize += headerBuffer[startSize + 2];
-
-                    var paddingSize = headerBuffer[startSize + 3];
-
-                    // DO NOT attempt to share this buffer, it has to be sent to
-                    // UI thread for decoding JPEG
-                    var dataBuffer = new byte[payloadSize + paddingSize];
-
-                    int payloadRead = 0;
-                    while (payloadRead != dataBuffer.Length)
+                    byte[] headerBuffer = new byte[8 + 128];
+                    while (cancel.IsCancellationRequested == false)
                     {
-                        var thisRead = stream.Read(dataBuffer, payloadRead, dataBuffer.Length - payloadRead);
-                        payloadRead += thisRead;
-                    }
+                        // camera will flush data in sequence, dont have to store it in temp
 
-                    if (isJpeg)
-                    {
-                        this.OnImageReceived(dataBuffer);
-                    }
+                        // read common head and payload header
+                        var bytesRead = stream.Read(headerBuffer, 0, 8 + 128);
 
+                        var isJpeg = headerBuffer[1] == 0x01;
+
+                        int startSize = 8 + 4;
+                        int payloadSize = headerBuffer[startSize];
+                        payloadSize <<= 8;
+                        payloadSize += headerBuffer[startSize + 1];
+                        payloadSize <<= 8;
+                        payloadSize += headerBuffer[startSize + 2];
+
+                        var paddingSize = headerBuffer[startSize + 3];
+
+                        // DO NOT attempt to share this buffer, it has to be sent to
+                        // UI thread for decoding JPEG
+                        var dataBuffer = new byte[payloadSize + paddingSize];
+
+                        int payloadRead = 0;
+                        while (payloadRead != dataBuffer.Length)
+                        {
+                            var thisRead = stream.Read(dataBuffer, payloadRead, dataBuffer.Length - payloadRead);
+                            payloadRead += thisRead;
+                        }
+
+                        if (isJpeg)
+                        {
+                            this.OnImageReceived(dataBuffer);
+                        }
+
+                    }
+                }
+                catch (Exception)
+                {
+                    this.LiveViewDisconnected();
                 }
 
             });

@@ -25,6 +25,8 @@ namespace NantCom.SonyCameraSDK
             _BaseUrl = baseUrl;
         }
 
+        public event Action CameraDisconnected = delegate { };
+
         private RestClient _RestClient;
 
         /// <summary>
@@ -87,12 +89,26 @@ namespace NantCom.SonyCameraSDK
 
                 }
 
-#if DEBUG
-                if (response != null && response.IsSuccess == false)
+                if (response == null) // no response, usually means camera is disconnected
                 {
-                    Debug.WriteLine("API Request Failed: {0}", (string)response.Error[1]);
+                    response = new SonyJsonRPCResponse();
+                    response.Error = new object[] { 999, "null response" };
+
+                    this.CameraDisconnected();
+                }
+#if DEBUG
+                else
+                {
+                    if (response.IsSuccess == false)
+                    {
+                        Debug.WriteLine("API Request Failed: {0}",
+                            response == null ? "No Response" : (string)response.Error[1]);
+
+                    }
                 }
 #endif
+
+                
 
                 return response;
             });
@@ -119,15 +135,29 @@ namespace NantCom.SonyCameraSDK
         public string Model { get; set; }
 
         /// <summary>
+        /// Occurs when last request seems to indicate that camera was disconnected
+        /// </summary>
+        public event Action CameraDisconnected = delegate { };
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CameraApiClient"/> class.
         /// </summary>
         /// <param name="baseUrl">The base URL.</param>
         public CameraApiClient( string model, string cameraBaseUrl, string systemBaseUrl, string avContentBaseUrl )
         {
             this.Model = model;
-            this.camera = new ApiRequestor(cameraBaseUrl + "/camera");
-            this.avContent = new ApiRequestor(avContentBaseUrl + "/avContent");
-            this.system = new ApiRequestor(systemBaseUrl + "/system");
+            
+            var cameraApi = new ApiRequestor(cameraBaseUrl + "/camera");
+            var avApi = new ApiRequestor(avContentBaseUrl + "/avContent");
+            var systemApi = new ApiRequestor(systemBaseUrl + "/system");
+
+            cameraApi.CameraDisconnected += ()=> { this.CameraDisconnected(); };
+            avApi.CameraDisconnected += ()=> { this.CameraDisconnected(); };
+            systemApi.CameraDisconnected += () => { this.CameraDisconnected(); };
+
+            this.camera = cameraApi;
+            this.avContent = avApi;
+            this.system = systemApi;
         }
 
         /// <summary>
@@ -361,9 +391,14 @@ namespace NantCom.SonyCameraSDK
         /// </returns>
         public Task<SonyJsonRPCResponse> ActZoom(ZoomDirection direction, ZoomMovement movement)
         {
-            return camera.actZoom( 
-                direction.ToString().ToLowerInvariant(), 
-                movement.ToString().ToLowerInvariant().Replace( "One", "1" ));
+            var moveParam = movement.ToString().ToLowerInvariant();
+            if (movement == ZoomMovement.OneShot)
+            {
+                moveParam = "1shot";
+            }
+
+            return camera.actZoom(
+                direction.ToString().ToLowerInvariant(), moveParam);
         }
 
         /// <summary>

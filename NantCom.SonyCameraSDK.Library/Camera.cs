@@ -124,6 +124,11 @@ namespace NantCom.SonyCameraSDK
 
         public bool? IsProgramShifted { get; private set; }
 
+        /// <summary>
+        /// Whether camera is still connected
+        /// </summary>
+        public bool IsCameraStillConnected { get; private set; }
+
         #endregion
 
         #region Setting Properties
@@ -205,6 +210,11 @@ namespace NantCom.SonyCameraSDK
         /// </summary>
         public event Action<bool> LongRunningProcessOccured = delegate { };
 
+        /// <summary>
+        /// Occured when there is a problem connecting to camera
+        /// </summary>
+        public event Action CameraConnectionProblem = delegate { };
+
         private bool _DisableUpdate = true;
 
         /// <summary>
@@ -231,6 +241,7 @@ namespace NantCom.SonyCameraSDK
         public Camera(CameraApiClient client) : this()
         {
             _Client = client;
+            _Client.CameraDisconnected += this.OnCameraDisconnected;
         }
         
         /// <summary>
@@ -240,6 +251,28 @@ namespace NantCom.SonyCameraSDK
         {
             _Context = SynchronizationContext.Current;
             this.InitializeSettings();
+        }
+
+        private void OnCameraDisconnected()
+        {
+            if (_LiveViewCancelSource != null)
+            {
+                _LiveViewCancelSource.Cancel();
+            }
+
+            if (_PollingCancelSource != null)
+            {
+                _PollingCancelSource.Cancel();
+            }
+
+            _Context.Post((o) =>
+            {
+                this.CameraConnectionProblem();
+
+            }, null);
+
+            this.IsCameraStillConnected = false;
+            this.OnPropertyChanged("IsCameraStillConnected");
         }
 
         private void OnPropertyChanged( string name )
@@ -574,9 +607,18 @@ namespace NantCom.SonyCameraSDK
                         Debug.WriteLine("Polling Status...");
 
                         var newEvent = await _Client.GetEvent(true);
+                        if (newEvent.Error != null && newEvent.Error[0] == 999)
+                        {
+                            // camera is disconnected
+                            this.OnCameraDisconnected();
+                            return;
+                        }
+
                         var changed2 = this.UpdateFromEventResponse(newEvent);
                         this.OnPropertyChanged(changed2);
 
+                        this.IsCameraStillConnected = true;
+                        this.OnPropertyChanged("IsCameraStillConnected");
                         Debug.WriteLine("Status has changed.");
 
                     }
@@ -634,7 +676,6 @@ namespace NantCom.SonyCameraSDK
 
             _LiveViewCancelSource = new CancellationTokenSource();
 
-
             await _Client.SetCurrentTime( DateTime.UtcNow,
                 (int)TimeZoneInfo.Local.BaseUtcOffset.TotalMinutes, 0);
 
@@ -642,6 +683,7 @@ namespace NantCom.SonyCameraSDK
 
             var liveViewUrl = (string)(await _Client.StartLiveview()).Result;
             _LiveViewClient = new LiveViewClient(liveViewUrl);
+            _LiveViewClient.LiveViewDisconnected += this.OnCameraDisconnected;
 
             _LiveViewClient.ImageReceived += (sender, data) =>
             {
