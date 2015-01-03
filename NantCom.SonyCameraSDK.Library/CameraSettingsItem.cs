@@ -57,14 +57,27 @@ namespace NantCom.SonyCameraSDK
                 {
                     _Value = value;
 
-                    if (this.Owner.DisableUpdate == false)
+                    if (this.Owner != null)
                     {
-                        this.OnNewValue(value);
+                        if (this.Owner.DisableUpdate == false)
+                        {
+                            this.OnNewValue(value);
+                        }
                     }
 
                     this.OnPropertyChanged("Value");
                 }
             }
+        }
+
+        public CameraSetting()
+        {
+
+        }
+
+        public CameraSetting( Camera owner )
+        {
+            this.Owner = owner;
         }
 
         /// <summary>

@@ -78,15 +78,7 @@ namespace NantCom.SonyCameraSDK
         {
             if ( _CurrentFrame - _FrameCompleted > 2 )
             {
-                GC.Collect(0, GCCollectionMode.Forced);
                 return;
-            }
-            else
-            {
-                if (_CurrentFrame % 30 == 0)
-                {
-                    GC.Collect(0, GCCollectionMode.Forced);
-                }
             }
 
             _CurrentFrame++;

@@ -215,7 +215,7 @@ namespace NantCom.SonyCameraSDK
         /// </summary>
         public event Action CameraConnectionProblem = delegate { };
 
-        private bool _DisableUpdate = true;
+        private bool _DisableUpdate = false;
 
         /// <summary>
         /// Disable Update
@@ -712,7 +712,7 @@ namespace NantCom.SonyCameraSDK
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public async void SetTouchAF( double x, double y )
+        public async Task SetTouchAF( double x, double y )
         {
             var result = await _Client.SetTouchAFPosition(x, y);
             if (result.IsSuccess)
