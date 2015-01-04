@@ -76,7 +76,7 @@ namespace NantCom.SonyCameraSDK
 
         private void OnImageReceived(byte[] data)
         {
-            if ( _CurrentFrame - _FrameCompleted > 2 )
+            if (_CurrentFrame - _FrameCompleted > 5)
             {
                 return;
             }
@@ -95,15 +95,22 @@ namespace NantCom.SonyCameraSDK
         {
             _Token = cancel;
 
-            TaskEx.Run(() =>
+            CancellationTokenSource watchDogCancel = new CancellationTokenSource();
+            var currentFrame = 0;
+
+            Action liveViewProcesor = () =>
             {
+                var myWatchDogToken = watchDogCancel.Token;
                 try
                 {
                     var stream = getHttpStream(_Url);
 
                     byte[] headerBuffer = new byte[8 + 128];
-                    while (cancel.IsCancellationRequested == false)
+                    while (cancel.IsCancellationRequested == false &&
+                            myWatchDogToken.IsCancellationRequested == false)
                     {
+                        currentFrame++;
+
                         // camera will flush data in sequence, dont have to store it in temp
 
                         // read common head and payload header
@@ -140,10 +147,41 @@ namespace NantCom.SonyCameraSDK
                 }
                 catch (Exception)
                 {
-                    this.LiveViewDisconnected();
+                    // silently fail and wait for watchdog to resurrect
                 }
+            };
 
-            });
+            var liveViewTask = Task.Run(liveViewProcesor, watchDogCancel.Token );
+
+            Action watchDog = async () =>
+            {
+                var watchDogFrame = 0;
+                while (cancel.IsCancellationRequested == false)
+                {
+                    await Task.Delay(1000);
+
+                    if (watchDogFrame == currentFrame) // no new frame in the last second
+                    {
+                        watchDogCancel.Cancel();
+                        watchDogCancel = new CancellationTokenSource();
+
+                        currentFrame = 0;
+                        watchDogFrame = 0;
+                        liveViewTask = Task.Run(liveViewProcesor, watchDogCancel.Token);
+
+                        await Task.Delay(2000); // wait for another 2 seconds for things to settled on another thread
+
+                    }
+                    else
+                    {
+                        watchDogFrame = currentFrame;
+                    }
+
+                    
+                }
+            };
+
+            Task.Run(watchDog);
         }
 
     }
